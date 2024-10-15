@@ -1,6 +1,3 @@
-<!-- <input bind:value={username} /><br />
-<button on:click={() => register()}>click</button> -->
-
 <style type="text/css">
     fieldset {
         margin: auto;
@@ -82,7 +79,11 @@
         const data = await res.json();
         const attestationResponse = await startRegistration(
             data.options.publicKey
-        );
+        ).catch((err) => {
+            alert(String(err));
+            return undefined;
+        });
+        if (!attestationResponse) return;
 
         const verificationResponse = await fetch(
             `${backend}/api/passkey/register/finish`,
@@ -122,7 +123,11 @@
         const data = await res.json();
         const attestationResponse = await startAuthentication(
             data.options.publicKey
-        );
+        ).catch((err) => {
+            alert(String(err));
+            return undefined;
+        });
+        if (!attestationResponse) return;
 
         const verificationResponse = await fetch(
             `${backend}/api/passkey/login/finish`,

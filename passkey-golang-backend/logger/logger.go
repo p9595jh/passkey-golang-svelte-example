@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"os"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -16,6 +17,7 @@ func init() {
 	time.Local = loc
 
 	zerolog.TimeFieldFormat = time.RFC3339
+	logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
 }
 
 func Debug() *zerolog.Event { return logger.Debug() }
