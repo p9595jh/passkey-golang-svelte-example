@@ -93,7 +93,6 @@ func BeginRegistration(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create new user with the given name and generated id
-	// user := entity.NewUser(userID, userDTO.Name)
 	user := &entity.User{
 		ID:        userID,
 		Name:      userDTO.Name,
@@ -165,6 +164,7 @@ func FinishRegistration(w http.ResponseWriter, r *http.Request) {
 	sd.User.AddCredential(credential)
 	repo.Save(sd.User)
 	scache.Delete(sid)
+	logger.Info().Msgf("user registered: %v", utils.Base64(sd.User.ID))
 
 	resp.JSONResponse(w, http.StatusOK, &dto.FinishRegistrationDTO{
 		Message: "registration success",
@@ -183,6 +183,11 @@ func BeginLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := repo.Find(userDTO.Name)
+	if user == nil {
+		resp.ErrorResponse(w, r, http.StatusNotFound, fmt.Errorf("user %v not found", userDTO.Name))
+		return
+	}
+
 	options, session, err := webAuthn.BeginLogin(user)
 	if err != nil {
 		resp.JSONResponse(w, http.StatusBadRequest, err)
@@ -255,6 +260,7 @@ func FinishLogin(w http.ResponseWriter, r *http.Request) {
 	// login session sustained until 1 hour
 	sessionID := uuid.NewString()
 	scache.Put(sessionID, loginSessionJSON, time.Hour)
+	logger.Info().Msgf("user logged in: %v", utils.Base64(sd.User.ID))
 
 	resp.JSONResponse(w, http.StatusOK, &dto.FinishLoginDTO{
 		SID: sessionID,

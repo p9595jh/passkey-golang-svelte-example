@@ -117,7 +117,8 @@
 
         if (!res.ok) {
             const msg = await res.json();
-            throw new Error(msg);
+            alert(JSON.stringify(msg, null, 2));
+            return;
         }
 
         const data = await res.json();
