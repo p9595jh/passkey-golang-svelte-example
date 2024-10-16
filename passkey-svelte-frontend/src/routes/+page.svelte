@@ -50,7 +50,6 @@
     const loginData = {
         name: '',
     };
-    let sessionId = '';
     let userInfo: any = undefined;
 
     async function register() {
@@ -144,7 +143,7 @@
 
         const msg = await verificationResponse.json();
         alert(JSON.stringify(msg, null, 2));
-        sessionId = msg.sid;
+        sessionStorage.setItem('sid', msg.sid);
     }
 
     async function requestUserData() {
@@ -152,7 +151,7 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Session-Id': sessionId,
+                'X-Session-Id': String(sessionStorage.getItem('sid')),
             },
         });
         userInfo = await res.json();
